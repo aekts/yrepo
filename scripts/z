@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -euo pipefail
+IFS=$'\n\t'
+
+show_status() {
+  if [ ! -d "$1/.git" ]; then
+    return
+  fi
+
+  local ahead=$(
+    (cd $1 && git status) |
+      rg -i "ahead" |
+      rg -io "[\d]+ commit[s]?" |
+      rg -o "[\d]+"
+  )
+  if [ "$ahead" ]; then
+    ahead=$(echo "+$ahead")
+  fi
+  printf "%7s %s\n" "$ahead" "$1"
+
+  local modified=$(cd $1 && git status --short)
+  if [ "$modified" ]; then
+    local n=$(echo "$modified" | wc -l)
+    for line in $(echo "$modified"); do
+      n=$(($n - 1))
+      printf "\t"
+      if [ "$n" -gt 0 ]; then
+        printf "├──"
+      else
+        printf "└──"
+      fi
+      printf " %s\n" "$line"
+    done
+  fi
+}
+
+for repo in $(ls -1d */); do
+  show_status $repo
+done

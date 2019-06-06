@@ -1,1 +1,5 @@
 # yrepo
+
+```sh
+stow scripts
+```
