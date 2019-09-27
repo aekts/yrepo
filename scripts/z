@@ -27,6 +27,6 @@ show_status() {
     done
 }
 
-for repo in $(ls -1d */); do
+for repo in $(ls -1dt */); do
   show_status $repo
 done
